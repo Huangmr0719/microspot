@@ -1,0 +1,27 @@
+defaults:
+  - _self_
+  - paths
+preprocess:
+  window_size: 128
+  stride: 64
+
+  flow:
+    w1: 0.7
+    w2: 0.3
+    method: tvl1
+
+  dhg:
+    base: 0.1
+    peak: 1.0
+
+  pseudo_apex:
+    use_if_overlap_half: True
+
+  neg_sample_ratio: 2
+
+  num_workers: 8
+
+  input_dir: ${paths.raw_data_dir}
+  output_dir: ${paths.preprocess_output_dir}
+
+  seed: 42

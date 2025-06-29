@@ -1,0 +1,7 @@
+datamodule:
+  window_size: ${preprocess.window_size}
+  segment_len: ${preprocess.window_size}
+  receptive_field: 32
+  micro_normal_range: 4
+  macro_normal_range: 4
+  segment_feat_root: ${paths.preprocess_output_dir}
