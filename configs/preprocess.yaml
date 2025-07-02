@@ -19,9 +19,11 @@ preprocess:
 
   neg_sample_ratio: 2
 
-  num_workers: 8
+  num_workers: 4
 
   input_dir: ${paths.raw_data_dir}
-  output_dir: ${paths.preprocess_output_dir}
+  flow_curve_dir: ${paths.flow_curve_dir}
+  output_dir: ${paths.preprocess_dir}
+  anno_file: ${paths.anno_file}
 
   seed: 42

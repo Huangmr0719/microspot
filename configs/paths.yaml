@@ -1,4 +1,5 @@
 paths:
   raw_data_dir: /data/users/user6/rxh/datasets/casme^2/74.220.215.205/Cropped224_all
-  preprocess_output_dir: /data/users/user6/rxh/datasets/casme^2/74.220.215.205/windows_npz
+  preprocess_dir: /data/users/user6/rxh/datasets/casme^2/74.220.215.205/prerpocess
   anno_file: /data/users/user6/rxh/datasets/casme^2/74.220.215.205/casme^2_anno.csv
+  flow_curve_dir: /data/users/user6/rxh/datasets/casme^2/74.220.215.205/casme^2_curves
