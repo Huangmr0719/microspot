@@ -1,0 +1,7 @@
+defaults:
+  - datamodule 
+  - model
+  - trainer
+  - _self_
+
+seed: 42

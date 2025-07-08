@@ -25,7 +25,8 @@ to_tensor = transforms.Compose([
 def main(cfg: DictConfig):
     clip_len = 16
     stride = 16
-    aggregate_mode = 'concat'  # mean or concat
+    L = cfg.preprocess.window_size
+    aggregate_mode = 'concat'
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -59,11 +60,16 @@ def main(cfg: DictConfig):
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             frames.append(img)
 
+        if len(frames) < L:
+            pad_num = L - len(frames)
+            frames += [frames[-1]] * pad_num
+
+        assert len(frames) == L, f"Window length mismatch: got {len(frames)}, expected {L}"
+
         all_feats = []
-        for start in range(0, len(frames) - clip_len + 1, stride):
+        for start in range(0, L - clip_len + 1, stride):
             clip = frames[start : start + clip_len]
 
-            # 如果不足 clip_len 就 padding 最后一帧
             if len(clip) < clip_len:
                 clip += [clip[-1]] * (clip_len - len(clip))
 
@@ -72,22 +78,26 @@ def main(cfg: DictConfig):
 
             with torch.no_grad():
                 outputs = model(**inputs)
-                feat = outputs.mean(dim=1).cpu().numpy()  # [N,D]
-                all_feats.append(feat.squeeze())
+                feat = outputs.squeeze(0).cpu().numpy() 
+                all_feats.append(feat)
 
-        all_feats = np.stack(all_feats, axis=0)  # [num_clips, D]
+        all_feats = np.stack(all_feats, axis=0)  # [N, D]
 
         if aggregate_mode == 'mean':
             final_feat = np.mean(all_feats, axis=0)
         elif aggregate_mode == 'concat':
-            final_feat = all_feats.flatten()
+            final_feat = all_feats  # 保留 [N,D] 结构
         else:
             raise ValueError(f"Unknown aggregate mode: {aggregate_mode}")
 
+        # print("final_feat::::",final_feat.shape)
+
+        # === 3. 保存 npz ===
+        existing = {k: data[k] for k in data.keys() if k != 'videomae_feature'}
         np.savez(
             output_path,
-            **{k: data[k] for k in data.keys()},
-            videomae_feature=final_feat.astype(np.float32)
+            **existing,
+            videomae_feature = final_feat.astype(np.float32)
         )
 
     print(f"✅ VideoMAE features saved to {cfg.paths.preprocess_dir}")

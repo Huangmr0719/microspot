@@ -61,6 +61,9 @@ def process_video(cfg, video_name, group):
         end = start + L
         win_curve = curve[start:end]
 
+        if len(win_curve) < L:
+            win_curve = np.pad(win_curve, (0, L - len(win_curve)), mode='edge')
+
         matches = []
         for _, row in group.iterrows():
             onset, offset = int(row['start_frame']), int(row['end_frame'])
@@ -87,6 +90,7 @@ def process_video(cfg, video_name, group):
                 local_peak = np.argmax(win_curve[on_win:off_win+1]) + on_win
                 ap_win = local_peak
                 micro_dhg = gen_dhg(L, on_win, ap_win, off_win, BASE, PEAK)
+            print("micro_dhg::::", micro_dhg)
 
         if macro_matches:
             max_macro = max(macro_matches, key=lambda x: x[0])
@@ -102,6 +106,14 @@ def process_video(cfg, video_name, group):
                 local_peak = np.argmax(win_curve[on_win:off_win+1]) + on_win
                 ap_win = local_peak
                 macro_dhg = gen_dhg(L, on_win, ap_win, off_win, BASE, PEAK)
+            print("macro_dhg::::", macro_dhg)
+
+        has_micro = micro_dhg.sum() > 0
+        has_macro = macro_dhg.sum() > 0
+
+        assert len(micro_dhg) == L
+        assert len(macro_dhg) == L
+    
 
         np.savez(
             output_dir / f"win{start}.npz",
@@ -112,7 +124,10 @@ def process_video(cfg, video_name, group):
                 subject = subject,
                 video   = video_name,
                 win_start = start,
-                win_end   = end
+                win_end   = end,
+                # expr_type = expr_type,
+                has_micro = has_micro,
+                has_macro = has_macro
             )
         )
 

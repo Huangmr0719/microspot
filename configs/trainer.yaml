@@ -1,0 +1,35 @@
+trainer:
+  _target_: pytorch_lightning.Trainer
+  accelerator: gpu
+  devices    : 1
+  precision  : 32
+  max_epochs : 50
+  log_every_n_steps: 50
+  enable_checkpointing: true
+  logger    : ${logger}
+  callbacks : ${callbacks}
+
+# ------------ Logger ------------------
+logger:
+  - _target_: pytorch_lightning.loggers.TensorBoardLogger
+    save_dir: logs
+    name    : microspot
+    default_hp_metric: false
+
+# ------------ Callbacks ---------------
+callbacks:
+  - _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    monitor: val/total
+    mode   : min
+    save_top_k: 3
+    filename: "epoch{epoch:02d}-val{val/total:.4f}"
+    save_last: true
+
+  - _target_: pytorch_lightning.callbacks.EarlyStopping
+    monitor: val/total
+    mode   : min
+    patience: 5
+    strict: true
+
+  - _target_: pytorch_lightning.callbacks.LearningRateMonitor
+    logging_interval: epoch

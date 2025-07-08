@@ -1,0 +1,16 @@
+model:
+  _target_: src.models.lit_module.MicroSpotLit   # ← LightningModule 类
+
+  # --- 优化 ----------
+  lr            : 1e-4
+
+  # --- 损失系数 ------
+  lambda_cls    : 1.0         # 分类 CE
+  lambda_smooth : 0.001        # 相邻帧平滑 L1
+  lambda_norm   : 0.001        # 全局 L1
+
+  # --- 网络结构 ------
+  num_classes   : 3           # 0: none, 1: micro, 2: macro
+  base_channels : 64
+  
+  context_dim   : 768 

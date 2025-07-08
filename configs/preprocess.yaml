@@ -11,7 +11,7 @@ preprocess:
     method: tvl1
 
   dhg:
-    base: 0.1
+    base: 0.2
     peak: 1.0
 
   pseudo_apex:
